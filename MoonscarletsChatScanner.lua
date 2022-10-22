@@ -1,3 +1,5 @@
+local messageCheckDuplicate
+
 local frameScanner = CreateFrame("FRAME")
 frameScanner:RegisterEvent("ADDON_LOADED"); -- Fired when saved variables are loaded
 frameScanner:RegisterEvent("PLAYER_LOGOUT"); -- Fired when user is logging out
@@ -214,6 +216,8 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 	elseif class=="Shaman" then classColor= "0070DE"
 	elseif class=="Warlock" then classColor= "9482C9"
 	elseif class=="Warrior" then classColor= "C79C6E"
+	elseif class=="Death Knight" then classColor= "C41E3A"
+	elseif class=="Demon Hunter" then classColor= "A330C9"
 	end
 	-------------------------
 	
@@ -238,6 +242,12 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 			end
 			
 			if checkFound then
+				if messageCheckDuplicate == message then --if same as previous message return
+					return
+				else
+					messageCheckDuplicate = message
+				end
+				
 				playerLink= "|Hplayer:"..sender.."|h"..chanName.."|h" --GetPlayerLink(characterName,linkDisplayText)
 				playerLink=  "|cff"..classColor.."["..playerLink.."]|r"-- Adding class color
 				-- msg= "|cAAFF0000FOUND(|r|cff92ff58"..v:upper().."|r|cffFF0000): |r|cff5892ff["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
