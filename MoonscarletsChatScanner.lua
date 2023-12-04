@@ -1,5 +1,6 @@
 local messageCheckDuplicate
 
+
 local frameScanner = CreateFrame("FRAME")
 frameScanner:RegisterEvent("ADDON_LOADED"); -- Fired when saved variables are loaded
 frameScanner:RegisterEvent("PLAYER_LOGOUT"); -- Fired when user is logging out
