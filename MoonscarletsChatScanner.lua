@@ -9,6 +9,7 @@ local enabled = true
 -- local master = true
 local master = false
 local mute = false
+local flash = false
 
 function frameScanner:OnEvent(event)
     if event == "ADDON_LOADED" then
@@ -59,6 +60,10 @@ local commands =
         print("Description : mute notification sound")
         print(" ")
 		
+		print("/CS flash")
+        print("Description : flash wow window")
+        print(" ")
+		
 		print("/CS enable")
         print("Description : Enables scanning")
         print(" ")
@@ -100,6 +105,12 @@ local commands =
         print("mute: " .. tostring(mute))
     end,
 	
+     ["flash"] = function()
+		flash= not flash
+        print("--")
+        print("flash: " .. tostring(flash))
+    end,
+	
      ["enable"] = function()
 		enabled= true
         print("--")
@@ -114,8 +125,9 @@ local commands =
 	
     ["list"] = function()
 		print("--")
-		print("Enabled:")
-		print(enabled)
+		print("enabled: " .. tostring(enabled))
+		print("master: " .. tostring(master))
+		print("flash: " .. tostring(flash))
         print("Watchlist:")
         if (whitelistedStringTable == nil) then
              print("Watchlist is empty")
@@ -237,10 +249,19 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 	message =  message:gsub("{[sS][Tt][aA][Rr]}", "")--remove marks
 	message =  message:gsub("{[cC][rR][oO][sS][sS]}", "")--remove marks
 	message =  message:gsub("{[Cc][Ii][rR][cC][Ll][eE]}", "")--remove marks
+	message =  message:gsub("{[xX]}", "")--remove marks
 	message =  message:gsub("{[tT][rR][iI][Aa][Nn][gG][lL][eE]}", "")--remove marks
 	message =  message:gsub("{[dD][iI][aA][mM][oO][nN][dD]}", "")--remove marks
+	message =  message:gsub("{[Gg][rR][eE][Ee][nN]}", "")--remove marks
+	message =  message:gsub("{[rR][Ee][dD]}", "")--remove marks
+	message =  message:gsub("{[bB][lL][uU][Ee]}", "")--remove marks
+	message =  message:gsub("{[pP][uU][rR][pP][lL][Ee]}", "")--remove marks
 	message =  message:gsub("{rt%d%d?}", "")
+	
 	message =  message:gsub("░", "")
+	message =  message:gsub("%s+"," ")
+	message =  message:gsub("☺", "")
+
 	------------------CLASS COLORS
 	local classColor
 	if 	   class=="Druid" then classColor= "FF7D0A" 
@@ -269,7 +290,7 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 			end
 		end
 		
-		for _, v in ipairs(whitelistedStringTable) do
+		for id, v in ipairs(whitelistedStringTable) do
 			local checkFound = true
 			for w in string.gmatch(v:lower(), "([^\|]+)") do
 				if (string.sub(w, 1, 1)~= "-" and not message:lower():find(w:lower())) or (string.sub(w, 1, 1)== "-" and message:lower():find(string.sub(w:lower(), 2))) then 
@@ -290,8 +311,7 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 				
 				playerLink= "|Hplayer:"..sender.."|h"..chanName.."|h" --GetPlayerLink(characterName,linkDisplayText)
 				playerLink=  "|cff"..classColor.."["..playerLink.."]|r"-- Adding class color
-				-- msg= "|cAAFF0000FOUND(|r|cff92ff58"..v:upper().."|r|cffFF0000): |r|cff5892ff["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
-				msg= "|cAAFF0000FOUND(|r|cff92ff58"..v:upper().."|r|cffFF0000): |r|cff5892ff\n["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
+				msg= "|cAAFF0000FOUND "..id.." (|r|cff92ff58"..v:upper():sub(1, 60).."|r|cffFF0000): |r|cff5892ff\n["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
 				
 				-- RaidNotice_AddMessage(RaidWarningFrame,msg, ChatTypeInfo["RAID_WARNING"])
 				DEFAULT_CHAT_FRAME:AddMessage(msg);
@@ -306,6 +326,10 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 					else
 						PlaySound(4041)--cat
 					end
+				end
+				
+				if flash then
+					FlashClientIcon()
 				end
 				---- PlaySound(1044)--centaur
 				return--SHOW ONLY IF 1st is FOUND TO AVOID SPAM NOTIFICATIONS
