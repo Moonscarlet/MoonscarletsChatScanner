@@ -218,7 +218,7 @@ SlashCmdList.CS = HandleSlashCommands
  
 local chatFrameScanner = CreateFrame("FRAME")
  
--- chatFrameScanner:RegisterEvent("CHAT_MSG_GUILD")
+chatFrameScanner:RegisterEvent("CHAT_MSG_GUILD")
 -- chatFrameScanner:RegisterEvent("CHAT_MSG_OFFICER")
 --chatFrameScanner:RegisterEvent("CHAT_MSG_BATTLEGROUND")--NO
 --chatFrameScanner:RegisterEvent("CHAT_MSG_BATTLEGROUND_LEADER")--NO
@@ -309,9 +309,45 @@ chatFrameScanner:SetScript("OnEvent", function(self,event,message,sender,chanStr
 					messageCheckDuplicate = message
 				end
 				
-				playerLink= "|Hplayer:"..sender.."|h"..chanName.."|h" --GetPlayerLink(characterName,linkDisplayText)
-				playerLink=  "|cff"..classColor.."["..playerLink.."]|r"-- Adding class color
-				msg= "|cAAFF0000FOUND "..id.." (|r|cff92ff58"..v:upper():sub(1, 60).."|r|cffFF0000): |r|cff5892ff\n["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
+				
+				-- if event == "CHAT_MSG_GUILD" then
+					-- playerLink = string.format("|Hplayer:%s|h[%s]|h", sender, player)
+					-- coloredPlayerLink = string.format("|cff%s%s|r", classColor, playerLink)
+					-- msg = string.format("|cAAFF0000FOUND %d (|r|cff92ff58%s|r|cffFF0000):\n|cff5892ff[Guild]|r |r%s|cff5892ff: %s|r", id, v:upper():sub(1, 60), coloredPlayerLink, message)
+					
+				-- elseif event == "CHAT_MSG_SAY" then
+					-- playerLink = string.format("|Hplayer:%s|h[%s]|h", sender, player)
+					-- coloredPlayerLink = string.format("|cff%s%s|r", classColor, playerLink)
+					-- msg = string.format("|cAAFF0000FOUND %d (|r|cff92ff58%s|r|cffFF0000):\n|cff5892ff[Say]|r |r%s|cff5892ff: %s|r", id, v:upper():sub(1, 60), coloredPlayerLink, message)
+					
+				-- elseif event == "CHAT_MSG_YELL" then
+					-- playerLink = string.format("|Hplayer:%s|h[%s]|h", sender, player)
+					-- coloredPlayerLink = string.format("|cff%s%s|r", classColor, playerLink)
+					-- msg = string.format("|cAAFF0000FOUND %d (|r|cff92ff58%s|r|cffFF0000):\n|cff5892ff[Yell]|r |r%s|cff5892ff: %s|r", id, v:upper():sub(1, 60), coloredPlayerLink, message)
+					
+				-- else
+					-- playerLink= "|Hplayer:"..sender.."|h"..chanName.."|h" --GetPlayerLink(characterName,linkDisplayText)
+					-- playerLink=  "|cff"..classColor.."["..playerLink.."]|r"-- Adding class color
+					-- msg= "|cAAFF0000FOUND "..id.." (|r|cff92ff58"..v:upper():sub(1, 60).."|r|cffFF0000): |r|cff5892ff\n["..chanNumber.."]|r "..playerLink.."|cff5892ff: "..message.."|r"
+				-- end
+				
+				if event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_SAY" or event == "CHAT_MSG_YELL" then
+					playerLink = string.format("|Hplayer:%s|h[%s]|h", sender, player)
+					coloredPlayerLink = string.format("|cff%s%s|r", classColor, playerLink)
+					
+					local chatType = {
+						CHAT_MSG_GUILD = "Guild",
+						CHAT_MSG_SAY = "Say",
+						CHAT_MSG_YELL = "Yell"
+					}
+					
+					msg = string.format("|cAAFF0000FOUND %d (|r|cff92ff58%s|r|cffFF0000):\n|cff5892ff[%s]|r |r%s|cff5892ff: %s|r", 
+						id, v:upper():sub(1, 60), chatType[event], coloredPlayerLink, message)
+				else
+					playerLink = "|Hplayer:" .. sender .. "|h" .. chanName .. "|h"
+					playerLink = "|cff" .. classColor .. "[" .. playerLink .. "]|r"
+					msg = "|cAAFF0000FOUND " .. id .. " (|r|cff92ff58" .. v:upper():sub(1, 60) .. "|r|cffFF0000): |r|cff5892ff\n[" .. chanNumber .. "]|r " .. playerLink .. "|cff5892ff: " .. message .. "|r"
+				end		
 				
 				-- RaidNotice_AddMessage(RaidWarningFrame,msg, ChatTypeInfo["RAID_WARNING"])
 				DEFAULT_CHAT_FRAME:AddMessage(msg);
